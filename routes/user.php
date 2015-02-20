@@ -1,6 +1,6 @@
 <?php
 
-$app->post('/user/reg', function () use($app) {
+$app->post('/user/reg', function () use($app,$si_userdb_obj,$si_userdb_que) {
 	//echo "This is user registration section";	
 	
 	$body = json_decode($app->request()->getBody());
@@ -17,25 +17,50 @@ $app->post('/user/reg', function () use($app) {
 			//echo "You want user reg";
 			$pin = $body->userinfo->pin;
 			$nik = $body->userinfo->nik;
-			
-			$filename = $nik.".pem";
 			//construct key
 			$pphrase = getkey($pin);
 			
 			//get keypair
 			$keypair = getrsakeypair($pphrase);
 			//var_dump($keypair);
+			//delete existing nik
+			$si_userdb_que->equalTo("nik", $nik);
+			$results = $si_userdb_que->find();
+			//echo "Successfully retrieved " . count($results) . " scores.";
+			// Do something with the returned ParseObject values
+			for ($i = 0; $i < count($results); $i++) {
+			  	$object = $results[$i];
+			  	//echo "Object ".$object->getObjectId()." deleted.";
+			  	$object->destroy();
+			}
 			
-			//save private key in SI
-			file_put_contents($filename, $keypair[0]);
-			
+			//save private key in database
+			//use time as key
+			$current_date = new DateTime("now");
+			$time = $current_date->format('Y-m-d H:i:s');
+			$key=getkey($time);
+			//encrypt private key
+			$result = encryptdb(json_encode($keypair[0]),$key);
+			//table: nik| privkey|
+			$si_userdb_obj->set("nik", $nik);
+			$si_userdb_obj->set("privkey", utf8_encode($result[0]));
+			$si_userdb_obj->set("iv", utf8_encode($result[1]));
+			$si_userdb_obj->set("created", $time);
+			try {
+				$si_userdb_obj->save();
+				//retrieve registration code
+				//$regcode = $si_userdb_obj->getObjectId();
+				//echo 'New object created with objectId: ' . $regcode;
+			} catch (ParseException $ex) {
+				// Execute any logic that should take place if the save fails.
+				// error is a ParseException object with an error code and message.
+				// echo 'Failed to create new object, with error message: ' + $ex->getMessage();
+			}
 			//no error, continue to response
 			$error=0;
-			
 			break;
 		default:
 			$error=1;
-			
 			break;
 		}
 	}
