@@ -44,7 +44,7 @@ function getrsakeypair($pphrase) {
 		"private_key_bits" => 4096,
 		"private_key_type" => OPENSSL_KEYTYPE_RSA,
 	);
-			
+	
 	$res=openssl_pkey_new($config);
 	// Get private key
 	openssl_pkey_export($res, $privkey, $pphrase );
@@ -56,4 +56,47 @@ function getrsakeypair($pphrase) {
 
 	//return as array. 0: private 1: public
 	return array($privkey,$pubkey);
+}
+
+
+function hitunghashdata($string) {
+    $algo = "sha256";
+    return hash($algo,$string);
+}
+
+function hitunghashfile($file) {
+    $algo = "sha256";
+    return hash_file($algo,$file);
+}
+
+function hitunghmacdata($string,$key) {
+    $algo = "sha256";
+    return hash_hmac($algo,$string,$key);
+}
+
+function hash_compare($a, $b) {
+    if (!is_string($a) || !is_string($b)) { 
+        return false; 
+    } 
+    $len = strlen($a); 
+    if ($len !== strlen($b)) { 
+        return false; 
+    } 
+    $status = 0; 
+    for ($i = 0; $i < $len; $i++) { 
+        $status |= ord($a[$i]) ^ ord($b[$i]); 
+    } 
+    return $status === 0; 
+}
+
+function proseshmac($signature, $OTP, $postedhash) {
+    //hitung hmac dengan OTP sebagai key
+    echo $hmacresult = hitunghmacdata($signature,$OTP);
+    // $hmacresult = hitunghmacdata($signature,$key);
+
+    // echo "sig=".$signature." OTP=".$OTP." hmac=".$hmacresult.PHP_EOL;
+    if (hash_compare($hmacresult, $postedhash)) {
+        return 1; 
+    }
+    return 0;
 }

@@ -1,4 +1,8 @@
 <?php
+use Parse\ParseObject;
+use Parse\ParseQuery;
+$si_userdb_obj = new ParseObject("si_userdb");
+$si_userdb_que = new ParseQuery("si_userdb");
 
 $app->post('/user/reg', function () use($app,$si_userdb_obj,$si_userdb_que) {
 	//echo "This is user registration section";	
