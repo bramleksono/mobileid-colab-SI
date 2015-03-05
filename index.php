@@ -20,11 +20,7 @@ $master_key= "ebTqQ5LbSHU9yxl2rXx9nUL0cdFtNmaevAcmz5BX";
 ParseClient::initialize( $app_id, $rest_key, $master_key );
 
 //Lib
-require 'lib/crypt.php';  // Handling cryptographic function
-require 'lib/addstruct.php';  // Construct client address
-require 'lib/sending.php';  // Handling sending http request function
-require 'lib/process.php';  // Handling frequently used function
-require 'lib/GCMPushMessage.php'; // Handling GCM push message to device
+require 'lib/SIcontroller.class.php'; // Handling User Class
 
 //Routes
 require 'routes/mid-user.php';

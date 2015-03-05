@@ -91,7 +91,7 @@ function hash_compare($a, $b) {
 
 function proseshmac($signature, $OTP, $postedhash) {
     //hitung hmac dengan OTP sebagai key
-    echo $hmacresult = hitunghmacdata($signature,$OTP);
+    $hmacresult = hitunghmacdata($signature,$OTP);
     // $hmacresult = hitunghmacdata($signature,$key);
 
     // echo "sig=".$signature." OTP=".$OTP." hmac=".$hmacresult.PHP_EOL;
