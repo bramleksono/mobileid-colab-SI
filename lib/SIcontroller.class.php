@@ -58,7 +58,7 @@ class SIcontroller {
     
     public function loginreq($request) {
         global $SIloginconfirm;
-        $error=2;
+        $error=1;
         
         $message = $request->message;
         $deviceid = $request->deviceid;
@@ -91,6 +91,7 @@ class SIcontroller {
     		$error = 0;
     	} else {
     		$error = 1;
+    		$this->reason = "Cannot contacting database";
     	}
 
 		//send request to GCM
@@ -98,11 +99,18 @@ class SIcontroller {
         $gcpm->fillDataLogin($message, $PID, $OTP, $SIloginconfirm);
         $response = $gcpm->sendGoogleCloudMessage();
         $response = json_decode($response);
-    	if ($response->success) {
-    		$error = 0;
-    	} else {
-    		$error = 2;
-    	}
+        if ($response) {
+            if ($response->success) {
+                $error=0;
+        }
+            else {
+                $this->reason = "GCM return errror";
+                $error=1;
+            }        	    
+        } else {
+            $this->reason = "Cannot send GCM";
+            $error = 1;
+        }
 	    return $error;
     }
     
@@ -113,14 +121,9 @@ class SIcontroller {
     					'PID' => $this->PID
     		));
     		break;
-    	case 1:
-    		return json_encode(array(	'success' => false,
-    					'reason' => "Cannot contacting database"
-    		));
-    		break;
     	default:
     		return json_encode(array(	'success' => false,
-    					'reason' => "Cannot send GCM"
+    					'reason' => $this->reason
     		));
     		break;
     	}
@@ -159,6 +162,8 @@ class SIcontroller {
     	} else {
             $error=2;
     	}
+    	
+    	return $error;
     }
     
     public function loginconfirmoutput($error) {
@@ -179,4 +184,136 @@ class SIcontroller {
     		break;
     	}
     }
+    
+    // Verification Section
+    
+    public function verifyreq($request) {
+        global $SIverifyconfirm;
+        $error=1;
+        
+        $message = $request->message;
+        $deviceid = $request->deviceid;
+    	$idnumber = $request->userinfo->nik;
+    	$callback = $request->callback;
+    	
+    	$current_date = new DateTime("now");
+    	$time = $current_date->format('Y-m-d H:i:s');
+    	$key=getkey($time);
+    	
+    	//get PID from time and nik
+        $PID = $this->getPID($time,$idnumber);
+        $this->PID = $PID;
+        
+    	//get OTP
+        $OTP = $this->getOTP();
+        
+        //construct form
+	    $form =  (object) array("userinfo" => $request->userinfo, "OTP" => $OTP, "callback" => $callback);
+
+	    //encrypt user info
+	    $result = encryptdb(json_encode($form),$key);
+    	$data = $result[0];
+    	$iv = $result[1];
+        
+        //save PID to database
+        $piddb = new SIpid($PID);
+        $pidresult = $piddb->storePIDDB($PID,$data,$time,$iv);
+    	if ($pidresult) {
+    		$error = 0;
+    	} else {
+    		$error = 1;
+    		$this->reason = "Cannot contacting database";
+    	}
+
+		//send request to GCM
+    	$gcpm = new GCMPushMessage($deviceid);
+        $gcpm->fillDataVerify($message, $PID, $OTP, $SIverifyconfirm);
+        $response = $gcpm->sendGoogleCloudMessage();
+        $response = json_decode($response);
+        if ($response) {
+            if ($response->success) {
+                $error=0;
+        }
+            else {
+                $this->reason = "GCM return errror";
+                $error=1;
+            }        	    
+        } else {
+            $this->reason = "Cannot send GCM";
+            $error = 1;
+        }
+	    return $error;
+    }
+    
+    public function verifyreqoutput($error) {
+        switch ($error) {
+    	case 0:
+    		return json_encode(array(	'success' => true,
+    					'PID' => $this->PID
+    		));
+    		break;
+    	default:
+    		return json_encode(array(	'success' => false,
+    					'reason' => $this->reason
+    		));
+    		break;
+    	}
+    }
+    
+    public function verifyconfirm($request) {
+        global $CAverifyconfirm;
+        $PID = $request->PID;
+        $postedHMAC = $request->HMAC;
+        
+        $error = 3;
+        
+        $data = new SIpid($PID);
+    	$data->fetchPIDDB();
+    	
+    	//process database result
+    	if ($data->isExist()) {
+    		//decode and show userinfo
+    		$form = $data->getPID();
+    		$userinfo = json_encode($form->userinfo);
+    		$OTP = $form->OTP;
+    		$callback = $form->callback;
+    		$idnumber = $form->userinfo->nik; 
+    		
+    		$userinfo = preg_replace('/\s+/', '', $userinfo);
+    		$signature = hitunghashdata($userinfo);
+    		$hmacresult = proseshmac($signature,$OTP,$postedHMAC);
+    		if ($hmacresult) {
+    			//send callback
+    			$form =  (object) array("PID" => $PID, "callback" => $callback, "userinfo" => (object) array("nik" => $idnumber));
+    			$form = json_encode($form);
+    			sendjson($form,$CAverifyconfirm);
+    			$error = 0;
+    		} else {
+    		    $error = 1;
+    		}
+    	} else {
+            $error=2;
+    	}
+    	
+    	return $error;
+    }
+    
+    public function verifyconfirmoutput($error) {
+        switch ($error) {
+    	case 0:
+    		return json_encode(array(	'success' => true
+    		));
+    		break;
+    	case 1:
+    		return json_encode(array(	'success' => false,
+    					'reason' => "HMAC failed"
+    		));
+    		break;
+    	default:
+    		return json_encode(array(	'success' => false,
+    					'reason' => "Cannot find PID"
+    		));
+    		break;
+    	}
+    }    
 }

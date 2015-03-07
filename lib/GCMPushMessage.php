@@ -31,10 +31,9 @@ class GCMPushMessage {
 		$this->data = array('message' => $json_message);
 	}
 
-	function fillDataIDverify($message, $AppID, $PID, $OTP, $SIcallbackaddr){
-		$json_message = '{"info":"'."data ID".
+	function fillDataVerify($message, $PID, $OTP, $SIcallbackaddr){
+		$json_message = '{"info":"'."verification".
 		                '","content":"'.$message.
-						'","AppID":"'.$AppID.
 						'","PID":"'.$PID.
 						'","OTP":"'.$OTP.
 						'","SIaddress":"'.$SIcallbackaddr.
@@ -52,28 +51,24 @@ class GCMPushMessage {
 		$this->data = array('message' => $json_message);
 	}
 
-	function fillDataWebSign($data, $SIsigncallbackaddr){
-		$json_message = '{"info":"websign","title":"'.$data["title"].','.$data["content"].
-						'","content":"'.$data["content"].
-						'","hash":"'.$data["hash"].
-						'","userid":"'.$data["userid"].
-						'","id":"'.$data["id"].
-						'","OTP":"'.$data["otp"].
-						'","PID":"'.$data["pid"].
+	function fillDataWebSign($hash, $message, $PID, $OTP, $SIcallbackaddr){
+		$json_message = '{"info":"'."websign".
+						'","content":"'.$message.
+						'","hash":"'.$hash.
+						'","OTP":"'.$OTP.
+						'","PID":"'.$PID.
 						'","SIaddress":"'.$SIsigncallbackaddr.
 						'"}';
 		$this->data = array('message' => $json_message);
 	}
 	
-	function fillDataDocSign($data, $SIdocsigncallbackaddr){
-		$json_message = '{"info":"docsign","title":"'.$data["title"].
-						'","content":"'.$data["content"].
-						'","hash":"'.$data["hash"].
-						'","userid":"'.$data["userid"].
-						'","id":"'.$data["id"].
-						'","OTP":"'.$data["otp"].
-						'","PID":"'.$data["pid"].
-						'","SIaddress":"'.$SIdocsigncallbackaddr.
+	function fillDataDocSign($hash, $message, $PID, $OTP, $SIcallbackaddr){
+		$json_message = '{"info":"'."docsign".
+						'","content":"'.$message.
+						'","hash":"'.$hash.
+						'","OTP":"'.$OTP.
+						'","PID":"'.$PID.
+						'","SIaddress":"'.$SIsigncallbackaddr.
 						'"}';
 		$this->data = array('message' => $json_message);
 	}
