@@ -142,7 +142,7 @@ class SIcontroller {
     	//process database result
     	if ($data->isExist()) {
     		//decode and show userinfo
-    		$form = $data->getPID();
+    		$form = json_decode($data->getPID());
     		$userinfo = json_encode($form->userinfo);
     		$OTP = $form->OTP;
     		$callback = $form->callback;
@@ -274,10 +274,10 @@ class SIcontroller {
     	if ($data->isExist()) {
     		//decode and show userinfo
     		$form = $data->getPID();
-    		$userinfo = json_encode($form->userinfo);
-    		$OTP = $form->OTP;
-    		$callback = $form->callback;
-    		$idnumber = $form->userinfo->nik; 
+    		$userinfo = json_encode($form["userinfo"]);
+    		$OTP = $form["OTP"];
+    		$callback = $form["callback"];
+    		$idnumber =$form["userinfo"]["nik"]; 
     		
     		$userinfo = preg_replace('/\s+/', '', $userinfo);
     		$signature = hitunghashdata($userinfo);
