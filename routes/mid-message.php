@@ -2,7 +2,7 @@
 //Routes for mobileid-message function
 
 $app->post('/message/', function () use ($app) {
-	$body = json_decode($app->request()->getBody());
+	$body = json_decode($app->request()->getBody(), true);
 	
 	$sendmessage = new SIcontroller();
 	$error = $sendmessage->messagereq($body);

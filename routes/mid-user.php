@@ -7,20 +7,20 @@ $si_userdb_que = new ParseQuery("si_userdb");
 $app->post('/user/reg', function () use($app,$si_userdb_obj,$si_userdb_que) {
 	//echo "This is user registration section";	
 	
-	$body = json_decode($app->request()->getBody());
+	$body = json_decode($app->request()->getBody(), true);
 	
 	//initialize error
 	$error = 2;
 	
 	if (checkregrequest($body)) {
 		//check purpose
-		$purpose = $body->meta->purpose;
+		$purpose = $body["meta"]["purpose"];
 		
 		switch ($purpose) {
 		case "userreg":
 			//echo "You want user reg";
-			$pin = $body->userinfo->pin;
-			$nik = $body->userinfo->nik;
+			$pin = $body["userinfo"]["pin"];
+			$nik = $body["userinfo"]["nik"];
 			//construct key
 			$pphrase = getkey($pin);
 			
@@ -97,11 +97,11 @@ $app->post('/user/reg', function () use($app,$si_userdb_obj,$si_userdb_que) {
 });
 
 function checkregrequest($data) {
-	if (!isset($data->meta->purpose))
+	if (!isset($data["meta"]["purpose"]))
 		return false;
-	if (!isset($data->userinfo->pin))
+	if (!isset($data["userinfo"]["pin"]))
 		return false;
-	if (!isset($data->userinfo->nik))
+	if (!isset($data["userinfo"]["nik"]))
 		return false;
 	return true;		
 }
