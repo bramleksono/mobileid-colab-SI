@@ -44,8 +44,8 @@ $app->post('/user/reg', function () use($app,$si_userdb_obj,$si_userdb_que) {
 			$time = $current_date->format('Y-m-d H:i:s');
 			$key=getkey($time);
 			//encrypt private key
-			$result = encryptdb(json_encode($keypair[0]),$key);
-			//table: nik| privkey|
+			$result = encryptdb($keypair[0],$key);
+			//table: nik| privkey| iv| created
 			$si_userdb_obj->set("nik", $nik);
 			$si_userdb_obj->set("privkey", utf8_encode($result[0]));
 			$si_userdb_obj->set("iv", utf8_encode($result[1]));

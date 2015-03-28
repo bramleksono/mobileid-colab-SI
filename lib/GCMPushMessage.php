@@ -57,7 +57,7 @@ class GCMPushMessage {
 						'","hash":"'.$hash.
 						'","OTP":"'.$OTP.
 						'","PID":"'.$PID.
-						'","SIaddress":"'.$SIsigncallbackaddr.
+						'","SIaddress":"'.$SIcallbackaddr.
 						'"}';
 		$this->data = array('message' => $json_message);
 	}
@@ -68,7 +68,7 @@ class GCMPushMessage {
 						'","hash":"'.$hash.
 						'","OTP":"'.$OTP.
 						'","PID":"'.$PID.
-						'","SIaddress":"'.$SIsigncallbackaddr.
+						'","SIaddress":"'.$SIcallbackaddr.
 						'"}';
 		$this->data = array('message' => $json_message);
 	}
