@@ -318,31 +318,43 @@ class SIcontroller {
     		
     		$hmacresult = proseshmac($signature,$OTP,$postedHMAC);
     		if ($hmacresult) {
+    		    
+    		    //download original document
+            	$fileurl = $form["document"]["fileurl"];
+            	$filename = pathinfo($fileurl, PATHINFO_BASENAME);
+            	$filepath = "./temp/".$filename;
+            	file_put_contents($filepath, fopen($fileurl, 'r'));
+            	
+            	$fileext = strtolower ( pathinfo($fileurl, PATHINFO_EXTENSION) );
+                
                 $current_date = new DateTime("now");
         	    $time = $current_date->format('Y-m-d H:i:s');
         	    
-    		    //generate pdf with message
-                
+                //create signing message
     		    $documentname = $form["document"]["documentname"];
     		    $message = "Document with name ".$documentname." has been signed by ".$idnumber." at time ".$time;
-                $signature = $form["userinfo"]["signature"];
-                
-                $signaturefile = "./temp/signature.jpg";
-                $this->base64_to_jpeg( $signature, $signaturefile);
-                
-                $generatedpath = $_SERVER["DOCUMENT_ROOT"].'/temp/generated.pdf';
-                
-                $documentcontroller = new SIdocument();
-                $documentcontroller->createsignpage($message,$signaturefile,$generatedpath);
-                
-                //download original document
-            	$fileurl = $form["document"]["fileurl"];
-            	$filepath = "./temp/original.pdf";
-            	file_put_contents($filepath, fopen($fileurl, 'r'));
-            	
-            	//combine to final document
-            	$finalpath = "./temp/".$form["documentnumber"].".signed.pdf";
-            	$documentcontroller->createsignedpdf($filepath,$generatedpath,$finalpath);
+        	    
+            	//signing selection based on file type
+            	switch ($fileext) {
+            	    case "pdf":
+                        $signature = $form["userinfo"]["signature"];
+                        $signaturefile = "./temp/signature.jpg";
+                        $this->base64_to_jpeg( $signature, $signaturefile);
+
+                        $generatedpath = $_SERVER["DOCUMENT_ROOT"].'/temp/generated.pdf';
+                        
+                        $documentcontroller = new SIdocument();
+                        $documentcontroller->createsignpage($message,$signaturefile,$generatedpath);
+
+                    	//combine to final document
+                    	$finalpath = "./temp/signed.".$filename;
+                    	$documentcontroller->createsignedpdf($filepath,$generatedpath,$finalpath);
+            	        break;
+            	   default:
+            	       //do not modify file
+            	       $finalpath = $filepath;
+            	       break;
+            	}
             	
             	//get private key using posted PIN
             	$keycontroller = new SIkey($idnumber);
