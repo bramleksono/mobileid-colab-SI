@@ -12,15 +12,9 @@ class ResourceNotFoundException extends Exception {}
 $configfile = 'config.json';
 $addressfile = 'config/address.json';
 
-//Parse Backend
-use Parse\ParseClient;
-$app_id = "";
-$rest_key = "";
-$master_key= "";
-ParseClient::initialize( $app_id, $rest_key, $master_key );
-
 //Lib
 require 'lib/SIcontroller.class.php'; // Handling User Class
+require 'config/parse.php';  // Initialize parse database
 
 //Routes
 require 'routes/mid-user.php';
