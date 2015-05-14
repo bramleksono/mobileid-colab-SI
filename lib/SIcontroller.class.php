@@ -390,7 +390,7 @@ class SIcontroller {
     		$form =  (object) array("documentnumber" => $form["documentnumber"], "signature" => $finalsignature, "signedhash" => $finalhash, "signedtime" => $time);
     		$form = json_encode($form);
     		
-    		echo $result = sendfile($finalpath, $form, $callback);
+    		$result = sendfile($finalpath, $form, $callback);
             //sample output : {"signedtime":"2015-03-28 07:15:29","finalhash":"1a1f05a1f6cf823fab41f69c0a00f64a64d5874d08265b9ffd5624092b5534a9","signature":"lftadtwwszA9DN7s6VDXOzHRPRowUV6AFRH4mWeKY//GPQ1mDulI1Wesrf4AzniN53W7+mwehjAF4gXLTV5MG68xUwoVKFKN2fK90kLSsnBmxPAJ1nxRVMmizZV3MbYZOLYyHj6IvIpaO00b7PgThTsqCncIH7hnHIdSpEx2ugp6Y3dcpAjqR9h/bRGO+btvRSsDsnuBMbajmRcKoUCGuj0S3G7QZGLmx6ifHLFqfl9Rzm+7wtfskKUbG93UqXM0DdnuiswMtwtQ4/LfHoOCLZezF5R4uVjd2sj/aga9J74W2zFhv5GMGba7Tmc6rC8ilVoUJsk2dQDkV0x/PAjcffMXz+Hiil9B/utM54hsZAa9nfVk3nhX30rkgRjUimdrwquRtfJrZUQitvO27WYx4TPie8wQMHj92l+XyLgPmC8sf7EiVKWBf13JTUA5eCOGZA9/txVb8ItTAn65vMokARzjEJqhEdihRFTfu+zjUErznMAzJD+Qk3wHTLM/PTbXI8lI6aOb+d7H6FSU+rca5/WbuyRkMIxcwgb1X1r79Zk7vD3QLykGV0v52ogxuRwa2CFRgX1Dt/eivollcQyAEYuxcX2evaPhlUkHMtLOKgyMPoi2rwdFU/+4DdzMimHlQ3dzgAYvOc2/XIYkX9DBSztaBgOF1LdFg4fIjm1XkBM=","documentnumber":"28007529dd4734671c2060cbcb7c2b85"}
     	}
     	return $error;
