@@ -184,18 +184,13 @@ class SIcontroller {
     public function verifyconfirmoutput($error) {
         switch ($error) {
     	case 0:
-    		return json_encode(array(	'success' => true
-    		));
+    		return "Login success. Check web page.";
     		break;
     	case 1:
-    		return json_encode(array(	'success' => false,
-    					'reason' => "HMAC failed"
-    		));
+    		return "Login failed. Invalid HMAC!";
     		break;
     	default:
-    		return json_encode(array(	'success' => false,
-    					'reason' => "Cannot find PID"
-    		));
+    		return "Login failed. Invalid PID!";
     		break;
     	}
     }    
@@ -399,18 +394,13 @@ class SIcontroller {
     public function documentconfirmoutput($error) {
         switch ($error) {
     	case 0:
-    		return json_encode(array(	'success' => true
-    		));
+    		return "Signing success. Refresh web page.";
     		break;
     	case 1:
-    		return json_encode(array(	'success' => false,
-    					'reason' => $this->reason
-    		));
+    		return "Signing failed. ".$this->reason;
     		break;
     	default:
-    		return json_encode(array(	'success' => false,
-    					'reason' => "Unknown error"
-    		));
+    		return "Signing failed. Unknown error";
     		break;
     	}    }
     
