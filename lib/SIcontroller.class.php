@@ -184,13 +184,13 @@ class SIcontroller {
     public function verifyconfirmoutput($error) {
         switch ($error) {
     	case 0:
-    		return "Login success. Check web page.";
+    		return "Identity request success. Check web page.";
     		break;
     	case 1:
-    		return "Login failed. Invalid HMAC!";
+    		return "Identity request failed. Invalid HMAC!";
     		break;
     	default:
-    		return "Login failed. Invalid PID!";
+    		return "Identity request failed. Invalid PID!";
     		break;
     	}
     }    
